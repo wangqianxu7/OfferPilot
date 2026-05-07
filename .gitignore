@@ -46,3 +46,7 @@ offerpilot.db
 *.tsbuildinfo
 next-env.d.ts
 .offerpilot_cache/
+
+# sqlite wal files
+*.db-shm
+*.db-wal
