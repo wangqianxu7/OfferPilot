@@ -1,7 +1,5 @@
 import { generateText } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
-
-const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+import { FLASH, PRO } from '../client';
 
 const TOPIC_NAMES: Record<string, string> = {
   'post-training': '大模型后训练（Post-Training）',
@@ -15,7 +13,7 @@ export async function generateBasicsQuestion(topic: string, history: { question:
   const historyStr = history.map(h => `Q: ${h.question}\nA: ${h.answer}`).join('\n\n');
 
   const { text } = await generateText({
-    model: openai('gpt-4o-mini'),
+    model: FLASH,
     prompt: `你是大模型算法面试官，正在考察候选人对「${topicName}」的知识掌握。
 
 ${historyStr ? `之前的问答：\n${historyStr}\n` : ''}
@@ -32,7 +30,7 @@ ${historyStr ? `之前的问答：\n${historyStr}\n` : ''}
 export async function judgeBasicsAnswer(question: string, answer: string, topic: string) {
   const topicName = TOPIC_NAMES[topic] || topic;
   const { text } = await generateText({
-    model: openai('gpt-4o'),
+    model: PRO,
     prompt: `你是大模型算法面试官。评估候选人对以下题目的回答。
 
 题目（${topicName}）：${question}

@@ -1,11 +1,9 @@
 import { generateText } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
-
-const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+import { FLASH, PRO } from '../client';
 
 export async function generateLeetCodeQuestion(difficulty: string = 'medium') {
   const { text } = await generateText({
-    model: openai('gpt-4o-mini'),
+    model: FLASH,
     prompt: `你是一个算法面试官。请出一道${difficulty}难度的算法题。
 
 要求输出严格JSON格式：
@@ -25,7 +23,7 @@ export async function generateLeetCodeQuestion(difficulty: string = 'medium') {
 
 export async function reviewLeetCodeCode(question: string, code: string) {
   const { text } = await generateText({
-    model: openai('gpt-4o'),
+    model: PRO,
     prompt: `你是算法面试官。审查候选人针对以下算法题写的代码。
 
 题目：${question}

@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db, schema } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import { generateText } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
-
-const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+import { FLASH } from '@/lib/ai/client';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -25,7 +23,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (vote === 'down') {
     downVotes++;
     const { text } = await generateText({
-      model: openai('gpt-4o-mini'),
+      model: FLASH,
       prompt: `之前的参考答案被用户点踩了。请重新生成一个更好的回答。
 
 问题：${row.question}

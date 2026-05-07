@@ -10,7 +10,8 @@ export async function POST(req: NextRequest) {
   whisperForm.append('model', 'whisper-1');
   whisperForm.append('language', 'zh');
 
-  const whisperRes = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+  const baseUrl = process.env.OPENAI_BASE_URL || 'https://api.openai.com';
+  const whisperRes = await fetch(`${baseUrl}/v1/audio/transcriptions`, {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` },
     body: whisperForm,

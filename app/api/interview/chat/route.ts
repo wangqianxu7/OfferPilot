@@ -1,9 +1,7 @@
 import { NextRequest } from 'next/server';
 import { streamText } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
+import { PRO } from '@/lib/ai/client';
 import { buildInterviewSystemPrompt, buildInterviewContext } from '@/lib/ai/interviewer';
-
-const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 export async function POST(req: NextRequest) {
   const { resumeText, projectDetails, history } = await req.json();
@@ -12,7 +10,7 @@ export async function POST(req: NextRequest) {
   const contextMessages = buildInterviewContext(history);
 
   const result = streamText({
-    model: openai('gpt-4o'),
+    model: PRO,
     system: systemPrompt,
     messages: contextMessages,
   });

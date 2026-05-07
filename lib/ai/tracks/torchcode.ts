@@ -1,7 +1,5 @@
 import { generateText } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
-
-const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+import { FLASH, PRO } from '../client';
 
 const TOPIC_NAMES: Record<string, string> = {
   'post-training': '大模型后训练',
@@ -15,7 +13,7 @@ export async function generateTorchCodeQuestion(topic: string, history: { questi
   const historyStr = history.map(h => `- ${h.question}`).join('\n');
 
   const { text } = await generateText({
-    model: openai('gpt-4o-mini'),
+    model: FLASH,
     prompt: `你是一个大模型算法面试官，正在考察候选人的PyTorch代码实现能力。
 
 专题方向：${topicName}
@@ -39,7 +37,7 @@ ${historyStr ? `之前出过的题（不要重复）：\n${historyStr}\n` : ''}
 
 export async function reviewTorchCode(question: string, code: string) {
   const { text } = await generateText({
-    model: openai('gpt-4o'),
+    model: PRO,
     prompt: `你是PyTorch专家。审查以下代码实现。
 
 题目要求：

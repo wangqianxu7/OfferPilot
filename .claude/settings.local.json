@@ -17,7 +17,8 @@
       "Bash(for path:*)",
       "Bash(sleep:*)",
       "Bash(echo:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(git add:*)"
     ]
   }
 }

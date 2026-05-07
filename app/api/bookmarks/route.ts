@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db, schema } from '@/lib/db';
 import { v4 as uuid } from 'uuid';
 import { generateText } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
+import { FLASH } from '@/lib/ai/client';
 import { desc } from 'drizzle-orm';
-
-const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 export async function GET() {
   const rows = await db.select().from(schema.bookmarks).orderBy(desc(schema.bookmarks.createdAt));
@@ -22,7 +20,7 @@ export async function POST(req: NextRequest) {
   const { sessionId, question, userAnswer } = await req.json();
 
   const { text } = await generateText({
-    model: openai('gpt-4o-mini'),
+    model: FLASH,
     prompt: `你是一个面试教练。请为以下面试问题生成一个高质量的参考答案，要具体、有结构、有技术深度。
 
 问题：${question}

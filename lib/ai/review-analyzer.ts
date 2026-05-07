@@ -1,11 +1,9 @@
 import { generateText } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
-
-const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+import { FLASH } from './client';
 
 export async function analyzeTranscript(transcript: string) {
   const { text } = await generateText({
-    model: openai('gpt-4o-mini'),
+    model: FLASH,
     prompt: `你是一个面试表现分析专家。分析以下面试录音转录文本，给出诊断报告。
 
 ${transcript}
