@@ -1,0 +1,44 @@
+.card { margin-bottom: 1.5rem; }
+
+.heading {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.status { font-size: 0.82rem; color: var(--accent); margin-top: 0.5rem; font-style: italic; }
+.error { font-size: 0.82rem; color: var(--danger); margin-top: 0.5rem; }
+
+.result { margin-top: 1rem; }
+.result h3 { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+
+.section { margin-bottom: 0.6rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
+
+.tag {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-right: 0.3rem;
+}
+
+.chip {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  background: var(--accent-light);
+  color: var(--accent);
+  border-radius: var(--radius-sm);
+}
+
+.projectItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.82rem;
+  width: 100%;
+  padding: 0.4rem;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+
+.desc { font-size: 0.75rem; color: var(--text-muted); }

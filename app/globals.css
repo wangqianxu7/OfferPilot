@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap');
+
+:root {
+  --bg:            #F7F4ED;
+  --bg-card:       #FCFAF5;
+  --bg-glass:      rgba(252, 250, 245, 0.92);
+  --sidebar-bg:    #EFE9DA;
+
+  --text:          #2D2926;
+  --text-light:    #5B5550;
+  --text-muted:    #8B8478;
+
+  --accent:        #4A7C96;
+  --accent-hover:  #3D657A;
+  --accent-light:  rgba(74, 124, 150, 0.08);
+  --accent-rgb:    74, 124, 150;
+
+  --success:       #5B8C5A;
+  --warning:       #C4884B;
+  --danger:        #B8554F;
+
+  --interviewer-bg:   rgba(74, 124, 150, 0.06);
+  --candidate-bg:     rgba(0, 0, 0, 0.04);
+  --feedback-bg:      rgba(91, 140, 90, 0.06);
+
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --border-width: 0.5px;
+  --border: #D8CFBE;
+  --shadow: rgba(45, 41, 38, 0.04);
+
+  --font-serif: 'Noto Serif SC', 'Songti SC', serif;
+  --font-ui: -apple-system, 'PingFang SC', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration: 0.3s;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}

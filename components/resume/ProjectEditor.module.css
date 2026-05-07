@@ -1,0 +1,29 @@
+.heading {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  margin-bottom: 0.4rem;
+}
+
+.hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.projectBlock {
+  margin-bottom: 1.2rem;
+  padding-bottom: 1rem;
+  border-bottom: var(--border-width) solid var(--border);
+}
+.projectBlock:last-child { border-bottom: none; margin-bottom: 0; }
+.projectBlock h3 { font-size: 0.9rem; margin-bottom: 0.4rem; color: var(--text); }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.saved { font-size: 0.75rem; color: var(--success); }

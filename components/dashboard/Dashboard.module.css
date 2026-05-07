@@ -1,0 +1,97 @@
+.page { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+.sectionTitle {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+/* Archive list */
+.archiveList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+
+.archiveCard {
+  background: var(--bg-card);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  min-width: 160px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.archiveCard:hover { border-color: var(--accent); background: var(--accent-light); }
+
+.archiveName {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+}
+
+.archiveDate {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.archiveEmpty {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Track cards */
+.trackGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.trackCard {
+  background: var(--bg-card);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  text-decoration: none;
+  transition: all 0.15s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.trackCard:hover { border-color: var(--accent); background: var(--accent-light); }
+
+.trackIcon { font-size: 1.5rem; }
+.trackName {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--text);
+  font-weight: 600;
+}
+.trackDesc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+
+/* History list */
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.historyItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.historyItem:hover { background: var(--accent-light); }
+
+.historyDate { font-size: 0.78rem; color: var(--text-muted); min-width: 60px; }
+.historyTrack { font-size: 0.82rem; color: var(--text); }

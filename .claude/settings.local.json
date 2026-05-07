@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(gh repo:*)",
+      "Bash(npx:*)",
+      "Read(//private/tmp/**)",
+      "Bash(rm -rf offerpilot-tmp)",
+      "Bash(\\\\ cp:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(ls:*)",
+      "Bash(sqlite3:*)",
+      "Bash(node:*)",
+      "Bash(find:*)",
+      "Bash(curl:*)",
+      "Bash(for path:*)",
+      "Bash(sleep:*)",
+      "Bash(echo:*)",
+      "Bash(git init:*)"
+    ]
+  }
+}

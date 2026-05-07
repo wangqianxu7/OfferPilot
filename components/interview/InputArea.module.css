@@ -1,0 +1,30 @@
+.bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-glass);
+  backdrop-filter: blur(8px);
+  border-top: var(--border-width) solid var(--border);
+  position: sticky;
+  bottom: 0;
+}
+
+.input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  resize: none;
+}
+
+.input:focus { outline: none; border-color: var(--accent); }
+
+.buttons {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.3rem;
+}
