@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import type { CacheIndex, CachedResume, CachedSession } from '@/shared/types';
-import { CACHE_DIR, RESUMES_DIR, PARSED_DIR, HISTORY_DIR, ANSWERS_DIR, INDEX_FILE } from './cache-types';
+import type { CacheIndex, CachedResume, CachedSession, CachedPaper } from '@/shared/types';
+import { CACHE_DIR, RESUMES_DIR, PARSED_DIR, HISTORY_DIR, ANSWERS_DIR, PAPERS_DIR, INDEX_FILE } from './cache-types';
 
 function ensureDirs() {
-  [CACHE_DIR, RESUMES_DIR, PARSED_DIR, HISTORY_DIR, ANSWERS_DIR].forEach(dir => {
+  [CACHE_DIR, RESUMES_DIR, PARSED_DIR, HISTORY_DIR, ANSWERS_DIR, PAPERS_DIR].forEach(dir => {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   });
 }
@@ -12,7 +12,7 @@ function ensureDirs() {
 function readIndex(): CacheIndex {
   ensureDirs();
   if (!fs.existsSync(INDEX_FILE)) {
-    const empty: CacheIndex = { resumes: [], sessions: [] };
+    const empty: CacheIndex = { resumes: [], sessions: [], papers: [] };
     fs.writeFileSync(INDEX_FILE, JSON.stringify(empty, null, 2));
     return empty;
   }
@@ -61,6 +61,32 @@ export function saveResumeJson(id: string, data: CachedResume) {
     index.resumes.push({ id, fileName: data.fileName, createdAt: data.createdAt });
   }
   writeIndex(index);
+}
+
+export function savePaperJson(id: string, data: CachedPaper) {
+  ensureDirs();
+  fs.writeFileSync(path.join(PAPERS_DIR, `${id}.json`), JSON.stringify(data, null, 2));
+
+  const index = readIndex();
+  const existing = index.papers?.find(p => p.id === id);
+  if (existing) {
+    existing.title = data.title;
+    existing.fileName = data.fileName;
+  } else {
+    if (!index.papers) index.papers = [];
+    index.papers.push({ id, title: data.title, fileName: data.fileName, createdAt: data.createdAt });
+  }
+  writeIndex(index);
+}
+
+export function loadPaper(id: string): CachedPaper | null {
+  const paperFile = path.join(PAPERS_DIR, `${id}.json`);
+  if (!fs.existsSync(paperFile)) return null;
+  return JSON.parse(fs.readFileSync(paperFile, 'utf-8'));
+}
+
+export function listPapers(): { id: string; title: string; fileName: string; createdAt: string }[] {
+  return readIndex().papers || [];
 }
 
 export function saveSession(session: CachedSession) {

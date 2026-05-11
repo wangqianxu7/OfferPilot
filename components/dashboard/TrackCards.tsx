@@ -6,6 +6,7 @@ const TRACKS = [
   { id: 'leetcode', icon: '⚙️', name: 'LeetCode算法', desc: '算法题 + LC原站链接 + AI评判', href: '/tracks/leetcode', needResume: false },
   { id: 'torchcode', icon: '🔥', name: '手撕代码', desc: 'PyTorch核心实现 · Monaco在线编辑器', href: '/tracks/torchcode', needResume: false },
   { id: 'resume', icon: '📋', name: '简历专项', desc: '基于你的简历和项目追问深挖', href: '/tracks/resume', needResume: true },
+  { id: 'paper', icon: '📄', name: '论文精读', desc: '上传技术论文，AI考察核心技术理解', href: '/tracks/paper', needResume: false },
 ];
 
 export function TrackCards({ hasResume }: { hasResume: boolean }) {

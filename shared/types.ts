@@ -92,6 +92,7 @@ export type TrainingTrack =
   | 'leetcode'
   | 'torchcode'
   | 'resume'
+  | 'paper'
   | 'comprehensive';
 
 export type BasicsTopic =
@@ -123,7 +124,17 @@ export interface TrackMessage {
   codeContent?: string;
   codeReview?: CodeReviewResult;
   feedback?: InterviewFeedback;
+  referenceAnswer?: string;
   timestamp: string;
+}
+
+export interface TrackBookmark {
+  id: string;
+  track: TrainingTrack;
+  topic?: BasicsTopic;
+  question: string;
+  referenceAnswer?: string;
+  createdAt: string;
 }
 
 export interface CachedResume {
@@ -145,7 +156,20 @@ export interface CachedSession {
   summary?: string;
 }
 
+export interface CachedPaper {
+  id: string;
+  title: string;
+  authors: string;
+  abstract: string;
+  keyTechniques: string[];
+  sectionSummary: string;
+  paperText: string;
+  fileName: string;
+  createdAt: string;
+}
+
 export interface CacheIndex {
   resumes: { id: string; fileName: string; createdAt: string }[];
   sessions: { id: string; track: string; date: string }[];
+  papers: { id: string; title: string; fileName: string; createdAt: string }[];
 }

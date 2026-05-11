@@ -1,8 +1,10 @@
 'use client';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTrackStore } from '@/stores/track-store';
+import { useTrackBookmarkStore } from '@/stores/track-bookmark-store';
 import { Button } from '@/components/ui/Button';
-import type { BasicsTopic, TrackMessage } from '@/shared/types';
+import { saveCache, clearCache } from '@/lib/client/storage';
+import type { BasicsTopic, TrackMessage, TrackBookmark } from '@/shared/types';
 import styles from './Track.module.css';
 
 const TOPICS: { value: BasicsTopic; label: string }[] = [
@@ -13,11 +15,26 @@ const TOPICS: { value: BasicsTopic; label: string }[] = [
 ];
 
 export function BasicsChat() {
-  const { messages, isStreaming, activeTopic, addMessage, setTopic, setStreaming } = useTrackStore();
+  const { messages, isStreaming, activeTopic, addMessage, setTopic, setStreaming, resetTrack } = useTrackStore();
+  const { init: initBookmarks, addBookmark, bookmarkedUserMsgIds } = useTrackBookmarkStore();
   const [input, setInput] = useState('');
+  const [refLoadingId, setRefLoadingId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+  useEffect(() => { initBookmarks(); }, [initBookmarks]);
+
+  // Auto-save on content change
+  useEffect(() => {
+    if (messages.length > 0 || activeTopic) {
+      saveCache('basics', { topic: activeTopic, messages });
+    }
+  }, [messages, activeTopic]);
+
+  const handleRefresh = () => {
+    clearCache('basics');
+    resetTrack();
+  };
 
   const handleTopicChange = (topic: BasicsTopic) => {
     setTopic(topic);
@@ -28,26 +45,79 @@ export function BasicsChat() {
     if (!activeTopic) return;
     setStreaming(true);
 
-    const history = messages
-      .filter(m => m.role === 'interviewer' && m.content)
-      .map(m => ({ question: m.content, answer: '' }));
+    try {
+      const history = messages
+        .filter(m => m.role === 'interviewer' && m.content)
+        .map(m => ({ question: m.content, answer: '' }));
 
-    const res = await fetch('/api/tracks/basics', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'question', topic: activeTopic, history }),
-    });
-    const { question } = await res.json();
+      const res = await fetch('/api/tracks/basics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'question', topic: activeTopic, history }),
+      });
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      const { question } = await res.json();
+      if (!question) throw new Error('Empty question');
 
-    const msg: TrackMessage = {
-      id: crypto.randomUUID(), sessionId: '',
-      track: 'basics', role: 'interviewer',
-      content: question, topic: activeTopic,
-      timestamp: new Date().toISOString(),
-    };
-    addMessage(msg);
+      const msg: TrackMessage = {
+        id: crypto.randomUUID(), sessionId: '',
+        track: 'basics', role: 'interviewer',
+        content: question, topic: activeTopic,
+        timestamp: new Date().toISOString(),
+      };
+      addMessage(msg);
+    } catch (e) {
+      console.error('出题失败:', e);
+      addMessage({
+        id: crypto.randomUUID(), sessionId: '',
+        track: 'basics', role: 'interviewer',
+        content: '⚠️ 出题失败，请稍后重试',
+        topic: activeTopic,
+        timestamp: new Date().toISOString(),
+      });
+    }
     setStreaming(false);
   }, [activeTopic, messages, addMessage, setStreaming]);
+
+  const fetchReference = useCallback(async (questionMsg: TrackMessage) => {
+    if (!activeTopic || refLoadingId) return;
+    setRefLoadingId(questionMsg.id);
+    try {
+      const res = await fetch('/api/tracks/basics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'reference',
+          topic: activeTopic,
+          question: questionMsg.content,
+        }),
+      });
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      const { referenceAnswer } = await res.json();
+      if (referenceAnswer) {
+        useTrackStore.getState().setReferenceAnswer(questionMsg.id, referenceAnswer);
+      }
+    } catch (e) {
+      console.error('获取参考答案失败:', e);
+    }
+    setRefLoadingId(null);
+  }, [activeTopic, refLoadingId]);
+
+  const handleBookmark = useCallback((candidateMsg: TrackMessage) => {
+    const candidateIdx = messages.indexOf(candidateMsg);
+    const question = [...messages].slice(0, candidateIdx).findLast(m => m.role === 'interviewer' && !m.content.startsWith('📝'));
+    if (!question) return;
+
+    const bookmark: TrackBookmark = {
+      id: candidateMsg.id,
+      track: 'basics',
+      topic: activeTopic ?? undefined,
+      question: question.content,
+      referenceAnswer: question.referenceAnswer,
+      createdAt: new Date().toISOString(),
+    };
+    addBookmark(bookmark);
+  }, [messages, activeTopic, addBookmark]);
 
   const submitAnswer = useCallback(async () => {
     if (!input.trim() || !activeTopic) return;
@@ -94,6 +164,8 @@ export function BasicsChat() {
         <div className={styles.trackHeader}>
           <span className={styles.trackTitle}>📚 大模型八股</span>
           <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>请先选择专题</span>
+          <div style={{ flex: 1 }} />
+          <Button variant="ghost" size="sm" onClick={handleRefresh}>🔄 刷新</Button>
         </div>
         <div className={styles.emptyState}>
           <span className={styles.emptyIcon}>📚</span>
@@ -122,6 +194,7 @@ export function BasicsChat() {
           {TOPICS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
         </select>
         <div style={{ flex: 1 }} />
+        <Button variant="ghost" size="sm" onClick={handleRefresh}>🔄 刷新</Button>
         <Button size="sm" onClick={startNewQuestion} disabled={isStreaming}>
           {messages.length === 0 ? '开始出题' : '下一题'}
         </Button>
@@ -137,13 +210,42 @@ export function BasicsChat() {
         {messages.map(m => (
           <div key={m.id} className={styles.messageRow}>
             {m.role === 'interviewer' ? (
-              <div className={styles.interviewerMsg}>{m.content}</div>
+              <>
+                <div className={styles.interviewerMsg}>{m.content}</div>
+                {!m.content.startsWith('📝') && (
+                  m.referenceAnswer ? (
+                    <div className={styles.referenceBox}>
+                      <div className={styles.referenceLabel}>📝 参考答案</div>
+                      <div>{m.referenceAnswer}</div>
+                    </div>
+                  ) : (
+                    <div className={styles.rowActions}>
+                      <button
+                        className={styles.actionBtn}
+                        onClick={() => fetchReference(m)}
+                        disabled={refLoadingId === m.id}
+                      >
+                        {refLoadingId === m.id ? '加载中...' : '📝 参考答案'}
+                      </button>
+                    </div>
+                  )
+                )}
+              </>
             ) : (
               <>
                 <div className={styles.candidateMsg}>{m.content}</div>
                 {m.feedback && (
-                  <div style={{ fontSize: '0.78rem', color: 'var(--accent)', padding: '0 0.5rem' }}>
-                    评分：{'⭐'.repeat(Math.min(m.feedback.score, 10))} ({m.feedback.score}/10)
+                  <div className={styles.rowActions} style={{ alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--accent)' }}>
+                      评分：{'⭐'.repeat(Math.min(m.feedback.score, 10))} ({m.feedback.score}/10)
+                    </span>
+                    <button
+                      className={bookmarkedUserMsgIds.has(m.id) ? styles.bookmarkedBtn : styles.actionBtn}
+                      onClick={() => handleBookmark(m)}
+                      disabled={bookmarkedUserMsgIds.has(m.id)}
+                    >
+                      {bookmarkedUserMsgIds.has(m.id) ? '✅ 已收藏' : '⭐ 收藏'}
+                    </button>
                   </div>
                 )}
               </>

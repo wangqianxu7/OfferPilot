@@ -85,6 +85,8 @@ export function InterviewChat() {
             ),
           }));
         }
+        // Persist after streaming completes
+        if (sessionId) persistMessages(`op_msgs_${sessionId}`);
       }
     } catch {}
     setStreaming(false);

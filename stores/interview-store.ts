@@ -13,9 +13,11 @@ interface InterviewState {
   sessions: SessionSummary[];
   isStreaming: boolean;
   startSession: (candidateId: string) => void;
+  resumeSession: (sessionId: string, candidateId: string) => void;
   addMessage: (msg: InterviewMessage) => void;
   setFeedback: (msgId: string, feedback: InterviewFeedback) => void;
   setStreaming: (v: boolean) => void;
+  restoreFromCache: (session: InterviewSession, messages: InterviewMessage[]) => void;
   endSession: () => void;
   loadSessions: () => void;
 }
@@ -28,11 +30,18 @@ export const useInterviewStore = create<InterviewState>((set) => ({
 
   startSession: (candidateId) => {
     const id = crypto.randomUUID();
-    const storageKey = `op_msgs_${id}`;
+    set({
+      session: { id, candidateId, status: 'active', startedAt: new Date().toISOString() },
+      messages: [],
+    });
+  },
+
+  resumeSession: (sessionId, candidateId) => {
+    const storageKey = `op_msgs_${sessionId}`;
     const stored = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
     const messages = stored ? JSON.parse(stored) : [];
     set({
-      session: { id, candidateId, status: 'active', startedAt: new Date().toISOString() },
+      session: { id: sessionId, candidateId, status: 'active', startedAt: new Date().toISOString() },
       messages,
     });
   },
@@ -46,6 +55,8 @@ export const useInterviewStore = create<InterviewState>((set) => ({
     })),
 
   setStreaming: (isStreaming) => set({ isStreaming }),
+
+  restoreFromCache: (session, messages) => set({ session, messages }),
 
   endSession: () =>
     set((s) => {

@@ -1,14 +1,44 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
+import { loadCache, saveCache, clearCache } from '@/lib/client/storage';
 import type { CodeReviewResult } from '@/shared/types';
 import styles from './Track.module.css';
 
+interface LeetCodeCache {
+  question: any;
+  code: string;
+  review: CodeReviewResult | null;
+}
+
 export function LeetCodePanel() {
-  const [question, setQuestion] = useState<any>(null);
-  const [code, setCode] = useState('');
-  const [review, setReview] = useState<CodeReviewResult | null>(null);
+  const [question, setQuestion] = useState<any>(() => {
+    const cached = loadCache<LeetCodeCache>('leetcode');
+    return cached?.question ?? null;
+  });
+  const [code, setCode] = useState<string>(() => {
+    const cached = loadCache<LeetCodeCache>('leetcode');
+    return cached?.code ?? '';
+  });
+  const [review, setReview] = useState<CodeReviewResult | null>(() => {
+    const cached = loadCache<LeetCodeCache>('leetcode');
+    return cached?.review ?? null;
+  });
   const [loading, setLoading] = useState(false);
+
+  // Auto-save
+  useEffect(() => {
+    if (question || code) {
+      saveCache('leetcode', { question, code, review });
+    }
+  }, [question, code, review]);
+
+  const handleRefresh = () => {
+    clearCache('leetcode');
+    setQuestion(null);
+    setCode('');
+    setReview(null);
+  };
 
   const generateQuestion = useCallback(async (difficulty: string = 'medium') => {
     setLoading(true);
@@ -60,6 +90,7 @@ export function LeetCodePanel() {
       <div className={styles.trackHeader}>
         <span className={styles.trackTitle}>⚙️ LeetCode算法</span>
         <div style={{ flex: 1 }} />
+        <Button size="sm" variant="ghost" onClick={handleRefresh}>🔄 刷新</Button>
         <Button size="sm" variant="ghost" onClick={() => setQuestion(null)}>换一题</Button>
       </div>
 

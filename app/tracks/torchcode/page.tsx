@@ -1,10 +1,19 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { CodeEditor } from '@/components/tracks/CodeEditor';
 import { CodeReview } from '@/components/tracks/CodeReview';
 import { Button } from '@/components/ui/Button';
+import { loadCache, saveCache, clearCache } from '@/lib/client/storage';
 import type { BasicsTopic, CodeReviewResult } from '@/shared/types';
 import styles from '@/components/tracks/Track.module.css';
+
+interface TorchCodeCache {
+  topic: BasicsTopic;
+  question: string;
+  code: string;
+  review: CodeReviewResult | null;
+  pastQuestions: { question: string }[];
+}
 
 const TOPICS: { value: BasicsTopic; label: string }[] = [
   { value: 'post-training', label: '后训练' },
@@ -14,12 +23,32 @@ const TOPICS: { value: BasicsTopic; label: string }[] = [
 ];
 
 export default function TorchCodePage() {
-  const [topic, setTopic] = useState<BasicsTopic>('post-training');
-  const [question, setQuestion] = useState('');
-  const [code, setCode] = useState('# 在这里编写你的PyTorch代码...\n');
-  const [review, setReview] = useState<CodeReviewResult | null>(null);
+  const cached = typeof window !== 'undefined' ? loadCache<TorchCodeCache>('torchcode') : null;
+
+  const [topic, setTopic] = useState<BasicsTopic>(cached?.topic ?? 'post-training');
+  const [question, setQuestion] = useState(cached?.question ?? '');
+  const [code, setCode] = useState(cached?.code ?? '# 在这里编写你的PyTorch代码...\n');
+  const [review, setReview] = useState<CodeReviewResult | null>(cached?.review ?? null);
   const [loading, setLoading] = useState(false);
-  const [pastQuestions, setPastQuestions] = useState<{ question: string }[]>([]);
+  const [pastQuestions, setPastQuestions] = useState<{ question: string }[]>(
+    cached?.pastQuestions?.slice(-50) ?? []
+  );
+
+  // Auto-save
+  useEffect(() => {
+    if (question || code !== '# 在这里编写你的PyTorch代码...\n') {
+      saveCache('torchcode', { topic, question, code, review, pastQuestions });
+    }
+  }, [topic, question, code, review, pastQuestions]);
+
+  const handleRefresh = () => {
+    clearCache('torchcode');
+    setTopic('post-training');
+    setQuestion('');
+    setCode('# 在这里编写你的PyTorch代码...\n');
+    setReview(null);
+    setPastQuestions([]);
+  };
 
   const generateQuestion = useCallback(async () => {
     setLoading(true);
@@ -72,6 +101,7 @@ export default function TorchCodePage() {
           {TOPICS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
         </select>
         <div style={{ flex: 1 }} />
+        <Button size="sm" variant="ghost" onClick={handleRefresh}>🔄 刷新</Button>
         <Button size="sm" onClick={generateQuestion} disabled={loading}>{question ? '换一题' : '开始出题'}</Button>
       </div>
 

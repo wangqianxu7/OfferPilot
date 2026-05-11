@@ -1,22 +1,22 @@
 'use client';
 import { useEffect } from 'react';
-import { BasicsChat } from '@/components/tracks/BasicsChat';
+import { PaperChat } from '@/components/tracks/PaperChat';
 import { useTrackStore } from '@/stores/track-store';
 import { loadCache } from '@/lib/client/storage';
-import type { BasicsTopic, TrackMessage } from '@/shared/types';
+import type { TrackMessage } from '@/shared/types';
 
-export default function BasicsPage() {
+export default function PaperPage() {
   const setTrack = useTrackStore(s => s.setTrack);
   const restoreSession = useTrackStore(s => s.restoreSession);
 
   useEffect(() => {
-    const cached = loadCache<{ topic: BasicsTopic | null; messages: TrackMessage[] }>('basics');
+    const cached = loadCache<{ paperData: any; messages: TrackMessage[] }>('paper');
     if (cached?.messages?.length) {
-      restoreSession('basics', cached.messages, cached.topic);
+      restoreSession('paper', cached.messages);
     } else {
-      setTrack('basics');
+      setTrack('paper');
     }
   }, [setTrack, restoreSession]);
 
-  return <BasicsChat />;
+  return <PaperChat />;
 }

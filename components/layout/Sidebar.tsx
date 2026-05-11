@@ -15,6 +15,7 @@ export function Sidebar({ sessions }: SidebarProps) {
         <Link href="/tracks/leetcode" className={styles.navItem}>⚙️ 算法</Link>
         <Link href="/tracks/torchcode" className={styles.navItem}>🔥 手撕</Link>
         <Link href="/tracks/resume" className={styles.navItem}>📋 简历</Link>
+        <Link href="/tracks/paper" className={styles.navItem}>📄 论文</Link>
         <Link href="/collection" className={styles.navItem}>⭐ 收藏</Link>
         <Link href="/review" className={styles.navItem}>📊 复盘</Link>
       </nav>

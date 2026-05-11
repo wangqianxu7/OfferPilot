@@ -11,7 +11,6 @@ if (!deepseekApiKey) {
 export const deepseek = createOpenAI({
   apiKey: deepseekApiKey,
   baseURL: DEEPSEEK_BASE_URL,
-  compatibility: 'strict', // DeepSeek 不支持 OpenAI 新版 responses API，强制用 chat/completions
 });
 
 // OpenAI 直连/代理（仅用于 Whisper 语音转录）
