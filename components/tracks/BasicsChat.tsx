@@ -147,6 +147,9 @@ export function BasicsChat() {
           strengths: [feedback.comment],
           improvements: [],
         });
+        if (feedback.referenceAnswer) {
+          useTrackStore.getState().setReferenceAnswer(lastQuestion.id, feedback.referenceAnswer);
+        }
         addMessage({
           id: crypto.randomUUID(), sessionId: '',
           track: 'basics', role: 'interviewer',

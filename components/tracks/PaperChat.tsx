@@ -202,6 +202,9 @@ export function PaperChat() {
           strengths: [feedback.comment],
           improvements: [],
         });
+        if (feedback.referenceAnswer) {
+          useTrackStore.getState().setReferenceAnswer(lastQuestion.id, feedback.referenceAnswer);
+        }
         addMessage({
           id: crypto.randomUUID(), sessionId: '',
           track: 'paper', role: 'interviewer',
