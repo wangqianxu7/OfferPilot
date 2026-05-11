@@ -231,6 +231,17 @@ export function PaperChat() {
     addBookmark(bookmark);
   }, [messages, addBookmark]);
 
+  const handleBookmarkQuestion = useCallback((questionMsg: TrackMessage) => {
+    const bookmark: TrackBookmark = {
+      id: questionMsg.id,
+      track: 'paper',
+      question: questionMsg.content,
+      referenceAnswer: questionMsg.referenceAnswer,
+      createdAt: new Date().toISOString(),
+    };
+    addBookmark(bookmark);
+  }, [addBookmark]);
+
   // No paper loaded — show upload + cached papers
   if (!paperData) {
     return (
@@ -327,6 +338,15 @@ export function PaperChat() {
                     <div className={styles.referenceBox}>
                       <div className={styles.referenceLabel}>📝 参考答案</div>
                       <div>{m.referenceAnswer}</div>
+                      <div className={styles.rowActions} style={{ marginTop: '0.4rem', padding: 0 }}>
+                        <button
+                          className={bookmarkedUserMsgIds.has(m.id) ? styles.bookmarkedBtn : styles.actionBtn}
+                          onClick={() => handleBookmarkQuestion(m)}
+                          disabled={bookmarkedUserMsgIds.has(m.id)}
+                        >
+                          {bookmarkedUserMsgIds.has(m.id) ? '✅ 已收藏' : '⭐ 收藏'}
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className={styles.rowActions}>
